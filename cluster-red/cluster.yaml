@@ -1,0 +1,18 @@
+apiVersion: cluster.x-k8s.io/v1alpha3
+kind: Cluster
+metadata:
+  name: managed-test
+  namespace: default
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+    kind: AWSManagedControlPlane
+    name: managed-test-control-plane
+  infrastructureRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+    kind: AWSManagedControlPlane
+    name: managed-test-control-plane
