@@ -6,4 +6,4 @@ metadata:
 spec:
   region: us-west-2
   sshKeyName: eksadm-key.pem
-  version: v1.17.0
+  version: v1.18
