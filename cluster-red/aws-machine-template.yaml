@@ -8,4 +8,4 @@ spec:
     spec:
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
       instanceType: t2.medium
-      sshKeyName: eksadm-key.pem
+      sshKeyName: eksadm-key
