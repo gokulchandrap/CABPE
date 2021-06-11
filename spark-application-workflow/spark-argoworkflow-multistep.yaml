@@ -13,89 +13,82 @@ spec:
         apiVersion: "sparkoperator.k8s.io/v1beta2"
         kind: SparkApplication
         metadata:
-          generateName: spark-argo-workflow-
-          namespace: argo
+          name: scala-spark
+          namespace: spark-operator
         spec:
-          concurrencyPolicy: Allow
-          dynamicAllocation:
-            enabled: false
-            initialExecutors: 2
           type: Scala
           mode: cluster
-          image: gokulpch/spark:v3.1.1
+          image: "gcr.io/spark-operator/spark:v3.0.0"
           imagePullPolicy: Always
           mainClass: org.apache.spark.examples.SparkPi
-          mainApplicationFile: local:///opt/spark/examples/jars/spark-examples_2.12-3.1.1.jar
+          mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.0.0.jar"
+          sparkVersion: "3.0.0"
           restartPolicy:
             type: Never
-          sparkVersion: 3.1.1
+          volumes:
+            - name: "test-volume"
+              hostPath:
+                path: "/tmp"
+                type: Directory
           driver:
-            memory: 1G
+            cores: 1
+            coreLimit: "1200m"
+            memory: "512m"
+            labels:
+              version: 3.0.0
+            serviceAccount: spark-spark
+            volumeMounts:
+              - name: "test-volume"
+                mountPath: "/tmp"
           executor:
-            cores: 2
-            memory: 1G
+            cores: 1
+            instances: 1
+            memory: "512m"
+            labels:
+              version: 3.0.0
+            volumeMounts:
+              - name: "test-volume"
+                mountPath: "/tmp"
   - name: step2
     resource:
       action: create
       manifest: |
-        apiVersion: "sparkoperator.k8s.io/v1beta2"
-        kind: SparkApplication
-        metadata:
-          generateName: spark-argo-workflow-
-          namespace: argo
-        spec:
-          concurrencyPolicy: Allow
-          dynamicAllocation:
-            enabled: false
-            initialExecutors: 2
-          type: Scala
-          mode: cluster
-          image: gokulpch/spark:v3.1.1
-          imagePullPolicy: Always
-          mainClass: org.apache.spark.examples.SparkPi
-          mainApplicationFile: local:///opt/spark/examples/jars/spark-examples_2.12-3.1.1.jar
-          restartPolicy:
-            type: Never
-          sparkVersion: 3.1.1
-          driver:
-            memory: 1G
-          executor:
-            cores: 2
-            memory: 1G   
-  - name: step3
-    resource:
-      action: create
-      manifest: |
-        apiVersion: "sparkoperator.k8s.io/v1beta2"
-        kind: SparkApplication
-        metadata:
-          generateName: spark-argo-workflow-
-          namespace: argo
-        spec:
-          concurrencyPolicy: Allow
-          dynamicAllocation:
-            enabled: false
-            initialExecutors: 2
-          type: Scala
-          mode: cluster
-          image: gokulpch/spark:v3.1.1
-          imagePullPolicy: Always
-          mainClass: org.apache.spark.examples.SparkPi
-          mainApplicationFile: local:///opt/spark/examples/jars/spark-examples_2.12-3.1.1.jar
-          restartPolicy:
-            type: Never
-          sparkVersion: 3.1.1
-          driver:
-            memory: 1G
-          executor:
-            cores: 2
-            memory: 1G
+         apiVersion: "sparkoperator.k8s.io/v1beta2"
+         kind: SparkApplication
+         metadata:
+           name: pyspark-pi
+           namespace: spark-operator
+         spec:
+           type: Python
+           pythonVersion: "2"
+           mode: cluster
+           image: "gcr.io/spark-operator/spark-py:v3.1.1"
+           imagePullPolicy: Always
+           mainApplicationFile: local:///opt/spark/examples/src/main/python/pi.py
+           sparkVersion: "3.1.1"
+           restartPolicy:
+             type: OnFailure
+             onFailureRetries: 3
+             onFailureRetryInterval: 10
+             onSubmissionFailureRetries: 5
+             onSubmissionFailureRetryInterval: 20
+           driver:
+             cores: 1
+             coreLimit: "1200m"
+             memory: "512m"
+             labels:
+               version: 3.1.1
+             serviceAccount: spark-spark
+           executor:
+             cores: 1
+             instances: 1
+             memory: "512m"
+           labels:
+             version: 3.1.1
   - name: dag-sequence
     dag:
       tasks:
-      - name: dag1
+      - name: dag1-scala
         template: step1
-      - name: dag2
+      - name: dag2-python
         template: step2
-      - name: dag3
-        template: step3
