@@ -1,6 +1,8 @@
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
 kind: AWSManagedControlPlane
 metadata:
+  labels:
+    cluster: eks
   name: red-cluster-control-plane
   namespace: default
 spec:

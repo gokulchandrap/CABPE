@@ -1,0 +1,14 @@
+---
+apiVersion: addons.cluster.x-k8s.io/v1alpha3
+kind: ClusterResourceSet
+metadata:
+ name: crs1
+ namespace: default
+spec:
+ mode: "ApplyOnce"
+ clusterSelector:
+   matchLabels:
+     cluster: eks
+ resources:
+   - name: argocd-system
+     kind: ConfigMap

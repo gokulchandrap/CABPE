@@ -1,6 +1,8 @@
 apiVersion: cluster.x-k8s.io/v1alpha3
 kind: MachineDeployment
 metadata:
+  labels:
+    cluster: eks
   name: red-cluster-md-0
   namespace: default
 spec:
